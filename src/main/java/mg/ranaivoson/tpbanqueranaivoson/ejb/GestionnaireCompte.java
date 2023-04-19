@@ -36,16 +36,32 @@ public class GestionnaireCompte {
     @PersistenceContext(unitName = "banquePU")
     private EntityManager em;
 
-
     public void creerCompte(CompteBancaire compte) {
-          em.persist(compte);
+        em.persist(compte);
     }
 
     public List<CompteBancaire> getAllComptes() {
-        String s="select c from comptebancaire as c";
-        TypedQuery<CompteBancaire> query=em.createQuery(s, CompteBancaire.class);
+        String s = "select c from CompteBancaire as c";
+        TypedQuery<CompteBancaire> query = em.createQuery(s, CompteBancaire.class);
         List<CompteBancaire> liste = query.getResultList();
+        System.out.print("coucou" + liste.get(0).getNom());
         return liste;
+    }
+    
+     public CompteBancaire findById(Long idCompte) {
+        return em.find(CompteBancaire.class, idCompte);
+    }
+
+    public void transferer(CompteBancaire source, CompteBancaire destination,
+            int montant) {
+        source.retirer(montant);
+        destination.deposer(montant);
+        update(source);
+        update(destination);
+    }
+
+    public CompteBancaire update(CompteBancaire compteBancaire) {
+        return em.merge(compteBancaire);
     }
 
 }
